@@ -1,0 +1,44 @@
+'use client'
+import ENDPOINT from "@/config/url";
+import { ViolationType } from "@/objects/violation-type.object";
+import { AppContext } from "@/user-components/contexts/app.context";
+import useInfiniteScroll from "@/user-components/hook/useInfiniteScroll.hook";
+import SearchBar from "@/user-components/ui/search-bar";
+import AddViolationType from "@/user-components/violation-type/add-violation-type.component";
+import ViolationTypeCard from "@/user-components/violation-type/violation-type-card.components";
+import ImportViolationType from "@/user-components/violation-type/violation-type-import.component";
+import { setDocumentTitle } from "@/util/util";
+import { useContext, useEffect, useState } from "react";
+
+export default function Page() {
+    const { school } = useContext(AppContext);
+    useEffect(()=>{
+      setDocumentTitle('Jenis Pelanggaran', school.name ?? "")
+    },[])
+    const [search, setSearch] = useState("");
+    const { data: violationTypes, loading, ref, refresh } = useInfiniteScroll<ViolationType, HTMLTableRowElement>({ filter: { search }, take: 20, url: ENDPOINT.MASTER_VIOLATION_TYPE })
+    function handleSearch(query: string) {
+        if (query !== search) {
+            setSearch(query);
+        }
+    }
+    return (
+        <div className="p-4 w-full">
+            <h1 className="scroll-m-20 text-2xl mb-4 font-extrabold tracking-tight lg:text-5xl">
+                Jenis Pelanggaran
+            </h1>
+            <div className="w-full flex flex-col gap-4">
+                <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+                    <SearchBar onSearch={handleSearch} />
+                    <AddViolationType reFetch={refresh} />
+                    <ImportViolationType reFetch={refresh} />
+                </div>
+                <div className="max-h-[31rem] gap-3 w-full overflow-x-auto overflow-y-auto flex flex-col">
+                    {violationTypes.map((violationType, index) => <ViolationTypeCard key={index} reFetch={refresh} ref={violationTypes.length === index + 1 ? ref : null} violationType={violationType} isLoading={loading} />)}
+
+                    {violationTypes.length === 0 && !loading && <p className="text-center">Jenis Pelanggaran Kosong</p>}
+                </div>
+            </div>
+        </div>
+    )
+}
