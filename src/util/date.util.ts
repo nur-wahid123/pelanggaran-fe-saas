@@ -90,3 +90,33 @@ export function formatRangeToExactString(from: Date, to: Date): string {
     return `${formatDateToExactString(from)} - ${formatDateToExactString(to)}`;
   }
 }
+
+export function timeAgo(date: Date): string {
+  const now = new Date();
+  let diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diff < 0) return 'di masa depan';
+
+  const units = [
+    { name: 'dekade',   secs: 60 * 60 * 24 * 365.25 * 10 },
+    { name: 'tahun',    secs: 60 * 60 * 24 * 365.25 },
+    { name: 'bulan',    secs: 60 * 60 * 24 * 30.44 },
+    { name: 'hari',     secs: 60 * 60 * 24 },
+    { name: 'jam',      secs: 60 * 60 },
+    { name: 'menit',    secs: 60 },
+    { name: 'detik',    secs: 1 }
+  ];
+
+  const parts: string[] = [];
+  for (const unit of units) {
+    if (diff >= unit.secs || (unit.name === 'detik' && parts.length === 0)) {
+      const amount = Math.floor(diff / unit.secs);
+      if (amount > 0 || unit.name === 'detik') {
+        // Untuk jamak/tunggal di bahasa Indonesia
+        parts.push(`${amount} ${unit.name}`);
+        diff = diff - amount * unit.secs;
+      }
+    }
+  }
+
+  return `${parts.join(' ')} yang lalu`;
+}

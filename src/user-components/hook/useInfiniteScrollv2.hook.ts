@@ -62,7 +62,7 @@ export default function useInfiniteScrollV2<T, T2>({
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         setLoading(false);
         setError(true);
       });

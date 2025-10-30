@@ -53,7 +53,7 @@ export default function SchoolDetailPage() {
           try {
             localStorage.setItem("token", token);
           } catch (error) {
-            console.log(error);
+            console.error(error);
           }
         } else {
           console.error("Token is undefined");
@@ -92,7 +92,7 @@ export default function SchoolDetailPage() {
         setSchool(res.data.data);
         fetchImage(res.data.data);
       } catch (e) {
-        console.log(e);
+        console.error(e);
         setSchool(null);
       } finally {
         setLoading(false);

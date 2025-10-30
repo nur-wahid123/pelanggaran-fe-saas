@@ -37,7 +37,7 @@ export function LoginForm({
           try {
             localStorage.setItem("token", token);
           } catch (error) {
-            console.log(error);
+            console.error(error);
           }
         } else {
           console.error("Token is undefined");

@@ -61,7 +61,7 @@ export default function Page() {
             });
             router.push('/dashboard/violation');
         } catch (error) {
-            console.log(error);
+            console.error(error);
             toast({
                 title: "Error",
                 description: "Gagal menghapus pelanggaran",

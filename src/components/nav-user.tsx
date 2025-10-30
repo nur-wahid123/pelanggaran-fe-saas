@@ -3,6 +3,7 @@
 import {
   ChevronsUpDown,
   LogOut,
+  LogsIcon,
   User2Icon,
 } from "lucide-react"
 
@@ -86,7 +87,13 @@ export function NavUser({
             <DropdownMenuItem asChild>
               <Link className="flex items-center gap-2" href={`/dashboard/profile`}>
                 <User2Icon className="size-4" aria-hidden="true" />
-                <span>Profile</span>
+                <span>Profil</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link className="flex items-center gap-2" href={`/dashboard/user-logs`}>
+                <LogsIcon className="size-4" aria-hidden="true" />
+                <span>Log User</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem

@@ -29,11 +29,9 @@ export default function EditSchoolPage() {
       const res = await axiosInstance.get(
         `${ENDPOINT.DETAIL_SCHOOL}/${slug}`
       );
-      console.log(res);
-      
       setSchool(res.data.data);
     } catch (e) {
-        console.log(e);
+        console.error(e);
         setSchool(null);
     } finally {
       setLoading(false);
@@ -74,9 +72,6 @@ export default function EditSchoolPage() {
         return;
       }
     }
-
-    console.log(school);
-    
 
     setSchool({
       ...school,

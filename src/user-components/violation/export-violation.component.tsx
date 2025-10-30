@@ -23,7 +23,7 @@ import {
   formatDateToExactStringAndTime,
   thisMonth,
 } from "@/util/date.util";
-import { Download } from "lucide-react";
+import { ArrowRightIcon, Download } from "lucide-react";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import DatePickerWithRange from "../dashboard/date-picker";
 import { axiosInstance } from "@/util/request.util";
@@ -75,8 +75,8 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
   const [loading, setLoading] = useState(false);
   const thisMnth = useMemo(() => thisMonth(), []);
   const [selectedMonth, setSelectedMonth] = useState(0);
-  const [exportType, setExportType] = useState<"date-range" | "per-month">(
-    "date-range"
+  const [exportType, setExportType] = useState<"date-range" | "per-month" | "all">(
+    "per-month"
   );
   const [dateRange, setDateRange] = useState<DateRange>({
     start_date: formatDate(thisMnth.startOfMonth),
@@ -86,6 +86,12 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
     setDateRange({ start_date: formatDate(from), finish_date: formatDate(to) });
   }, []);
   const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (exportType === "all") {
+      setDate(appStartDate, new Date());
+    }
+  }, [exportType]);
 
   useEffect(() => {
     setAppStartDate(
@@ -130,7 +136,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
           }
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
           setLoading(false);
         });
       return hasNext;
@@ -188,7 +194,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
       }
       exportData(dataCollection, dataPerStudent, dataPerViolationType);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       toaster.toast({
         variant: "destructive",
         title: "Gagal Ambil Data",
@@ -302,7 +308,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
             imageIds.push({ imageId, width: img.width, height: img.height });
           }
 
-          // console.log(imageIds);
+          // console.error(imageIds);
 
           const exampleRow = worksheet.addRow([
             i + 1,
@@ -362,7 +368,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
           }
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
       setProgress(75);
 
@@ -528,6 +534,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
       setProgress(90);
       a.href = url;
       a.download = `Export Data Pelanggaran ${formatDateToExactString(new Date(dateRange.start_date))} - ${formatDateToExactString(new Date(dateRange.finish_date))}.xlsx`;
+      await axiosInstance.post(`${ENDPOINT.SET_EXPORT_VIOLATION}`);
       a.click();
       URL.revokeObjectURL(url);
       setProgress(100);
@@ -564,9 +571,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
                 disabled={loading}
                 value={exportType}
                 onValueChange={(e) =>
-                  e === "date-range"
-                    ? setExportType("date-range")
-                    : setExportType("per-month")
+                  setExportType(e as "date-range" | "per-month" | "all")
                 }
               >
                 <SelectTrigger className="w-[180px]">
@@ -575,9 +580,10 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
                 <SelectContent>
                   <SelectItem value="date-range">Rentang Tanggal</SelectItem>
                   <SelectItem value="per-month">Per Bulan</SelectItem>
+                  <SelectItem value="all">Semua</SelectItem>
                 </SelectContent>
               </Select>
-              {exportType === "date-range" ? (
+              {exportType === "date-range" && (
                 <div className="flex flex-col gap-4">
                   <Label>Pilih Tanggal</Label>
                   <DatePickerWithRange
@@ -587,7 +593,8 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
                     setOutDate={setDate}
                   />
                 </div>
-              ) : (
+              )}
+              {exportType === "per-month" && (
                 <div className="flex flex-col gap-4">
                   <Label>Pilih Bulan</Label>
                   <Select
@@ -606,6 +613,16 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+              )}
+              {exportType === "all" && (
+                <div className="flex flex-col items-center gap-4 justify-center w-full">
+                  Export Semua Mulai Awal
+                  <div className=" flex gap-3 justify-center font-semibold text-black items-center">
+                    {formatDateToExactString(new Date(dateRange.start_date))}
+                    <ArrowRightIcon className="text-slate-300" />
+                    {formatDateToExactString(new Date(dateRange.finish_date))}
+                  </div>
                 </div>
               )}
               {loading && <Progress value={progress} max={100} />}
