@@ -81,7 +81,7 @@ function AddViolationType({ reFetch }: { reFetch: () => void }) {
                         value={value.point}
                         onChange={(e) => setValue({ ...value, point: +e.target.value })}
                     />
-                    <Button type="submit">
+                    <Button disabled={loading} type="submit">
                         Tambah Pelanggaran
                     </Button>
                 </form>
