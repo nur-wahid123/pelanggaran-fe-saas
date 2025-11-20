@@ -10,14 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-export default ({reFetch}: { reFetch: () => void }) => {
+export default ({ reFetch }: { reFetch: () => void }) => {
     const [openAddClass, setOpenAddClass] = useState(false);
+    const [loading, setLoading] = useState(false)
     const toast = useToast()
     const [value, setValue] = useState({
         name: "",
     })
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        setLoading(true)
         e.preventDefault();
         await axiosInstance.post(ENDPOINT.CREATE_CLASS, value)
             .then(() => {
@@ -31,6 +33,9 @@ export default ({reFetch}: { reFetch: () => void }) => {
                 setValue({
                     name: "",
                 })
+                setTimeout(() => {
+                    setLoading(false)
+                }, 1000);
             })
             .catch((error) => {
                 if (error.code === 400) {
@@ -46,6 +51,7 @@ export default ({reFetch}: { reFetch: () => void }) => {
                         variant: "destructive",
                     })
                 }
+                setLoading(false)
             })
     };
 
@@ -65,7 +71,7 @@ export default ({reFetch}: { reFetch: () => void }) => {
                         value={value.name}
                         onChange={(e) => setValue({ ...value, name: e.target.value })}
                     />
-                    <Button type="submit">
+                    <Button disabled={loading} type="submit">
                         Tambah Kelas
                     </Button>
                 </form>

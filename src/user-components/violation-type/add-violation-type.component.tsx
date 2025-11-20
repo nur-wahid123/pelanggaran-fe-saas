@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-function AddViolationType({reFetch}: { reFetch: () => void }) {
+function AddViolationType({ reFetch }: { reFetch: () => void }) {
     const [openAddViolationn, setOpenAddViolationn] = useState(false);
+    const [loading, setLoading] = useState(false)
     const toast = useToast()
     const [value, setValue] = useState({
         name: "",
@@ -19,6 +20,7 @@ function AddViolationType({reFetch}: { reFetch: () => void }) {
     })
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        setLoading(true)
         e.preventDefault();
         await axiosInstance.post(ENDPOINT.CREATE_VIOLATION_TYPE, value)
             .then(() => {
@@ -33,8 +35,12 @@ function AddViolationType({reFetch}: { reFetch: () => void }) {
                     name: "",
                     point: 0
                 })
+                setTimeout(() => {
+                    setLoading(false)
+                }, 1000);
             })
             .catch((error) => {
+                setLoading(true)
                 if (error.code === 400) {
                     toast.toast({
                         title: "Error",
@@ -54,8 +60,8 @@ function AddViolationType({reFetch}: { reFetch: () => void }) {
     return (
         <Dialog open={openAddViolationn} onOpenChange={setOpenAddViolationn}>
             <DialogTrigger asChild>
-                <Button className="flex gap-3 shadow hover:shadow-md" variant="outline"><AlertTriangle className="w-4"/>Tambah
-                    Jenis Pelanggaran <PlusIcon className="w-4"/></Button>
+                <Button className="flex gap-3 shadow hover:shadow-md" variant="outline"><AlertTriangle className="w-4" />Tambah
+                    Jenis Pelanggaran <PlusIcon className="w-4" /></Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
@@ -66,14 +72,14 @@ function AddViolationType({reFetch}: { reFetch: () => void }) {
                     <Input
                         type="text"
                         value={value.name}
-                        onChange={(e) => setValue({...value, name: e.target.value})}
+                        onChange={(e) => setValue({ ...value, name: e.target.value })}
                     />
                     <Label>Poin Pelanggaran</Label>
                     <Input
                         type="number"
                         inputMode="numeric"
                         value={value.point}
-                        onChange={(e) => setValue({...value, point: +e.target.value})}
+                        onChange={(e) => setValue({ ...value, point: +e.target.value })}
                     />
                     <Button type="submit">
                         Tambah Pelanggaran

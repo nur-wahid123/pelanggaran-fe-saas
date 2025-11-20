@@ -118,9 +118,9 @@ export default function StudentAndViolationInput() {
           variant: "destructive",
         });
         setDialogVisibility(false);
+        setIsLoading(false);
         return;
       } finally {
-        setIsLoading(false);
         setProgress(0);
       }
     }
@@ -168,7 +168,7 @@ export default function StudentAndViolationInput() {
         });
         setIsLoading(false);
       }).finally(()=>{
-        setIsLoading(false);
+        // setIsLoading(false);
         setSearch({ ...search, student: "", violation: "" });
         setProgress(0);
       });
