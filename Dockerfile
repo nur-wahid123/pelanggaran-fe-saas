@@ -1,15 +1,12 @@
 
 FROM node:20-alpine AS base
 
-# Install pnpm globally in the base image
-RUN npm install -g pnpm
-
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+COPY package.json package-lock.json* ./
+RUN npm ci
 
 FROM base AS builder
 WORKDIR /app
@@ -19,7 +16,7 @@ COPY . .
 ARG BASE_URL
 ENV BASE_URL=${BASE_URL}
 
-RUN pnpm run build
+RUN npm run build
 
 FROM base AS runner
 WORKDIR /app
@@ -42,4 +39,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["pnpm", "start"]
+CMD ["npx", "next", "start"]
