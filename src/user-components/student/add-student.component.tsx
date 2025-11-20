@@ -75,14 +75,17 @@ export default function AddStudent({ refresh }: AddStudentProps) {
       });
       refresh();
       setOpen(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     } catch (err: any) {
       setError(
         err?.response?.data?.message ||
         err?.message ||
         "Terjadi kesalahan"
       );
-    } finally {
       setLoading(false);
+    } finally {
     }
   }
 

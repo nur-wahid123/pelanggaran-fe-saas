@@ -1,4 +1,5 @@
 import ENDPOINT from "@/config/url";
+import heic2any from 'heic2any'
 import { axiosInstance } from "./request.util";
 
 export function toTitleCase(str: string): string {
@@ -70,6 +71,19 @@ export function setDocumentTitle(title: string, prefix: string): void {
   if (typeof window !== "undefined" && typeof document !== "undefined") {
     document.title = `${title} - ${prefix}`;
   }
+}
+
+export async function convertHeic(file: File): Promise<File> {
+  const blob = await heic2any({
+      blob: file,
+      toType: "image/jpeg",
+  });
+
+  return new File(
+      [blob as Blob],
+      file.name.replace(/\.heic$/i, ".jpg"),
+      { type: "image/jpeg" }
+  );
 }
 
 
