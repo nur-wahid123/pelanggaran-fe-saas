@@ -64,6 +64,7 @@ export default function useInfiniteScroll<T, T2 extends Element>({
   const observer = useRef<IntersectionObserver | null>(null);
   const ref = useCallback(
     (node: T2 | null) => {
+      if (typeof window === "undefined") return;
       if (isFetchingNextPage) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
