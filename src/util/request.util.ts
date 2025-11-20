@@ -2,8 +2,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 export const getToken = () => {
-  const token = localStorage.getItem("token");
-  return token;
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("token");
 };
 
 export const axiosInstance = axios.create({
@@ -16,29 +16,35 @@ export const axiosInstance = axios.create({
 export function logout() {
   if (typeof window !== "undefined") {
     Cookies.remove("token");
+    localStorage.removeItem("token");
     window.location.href = "/login";
   }
 }
 
 axiosInstance.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const token = getToken();
-    if (token) {
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const status = error?.response?.status;
+
+    if (status === 401) {
       if (typeof window !== "undefined") {
+        Cookies.remove("token");
+        localStorage.removeItem("token");
         window.location.href = "/login";
       }
     }
+
     return Promise.reject(error);
-  },
+  }
 );
