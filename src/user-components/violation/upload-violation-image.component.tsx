@@ -86,13 +86,13 @@ export default function UploadViolationImages({ files, setFiles }: { files: File
                             const ext = file.name.split('.').pop()?.toLowerCase()
                             if (ext === "heic") {
                                 return await convertHeic(file).then((a) => {
-                                    setLoading(false)
                                     return a
                                 })
                             }
                             return file
                         })
                     )
+                    setLoading(false)
 
                     setFiles((prev) => [...prev, ...processedFiles])
                     e.target.value = ""
