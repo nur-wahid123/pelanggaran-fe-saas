@@ -44,9 +44,9 @@ export default function RootLayout({
   });
 
   const [school, setSchool] = useState<SchoolInfo>({
-    address:"",
-    logo:0,
-    name:""
+    address: "",
+    logo: 0,
+    name: ""
   });
   const [loading, setLoading] = useState(true);
   const fetchUser = useCallback(async () => {
@@ -58,9 +58,9 @@ export default function RootLayout({
       setLoading(false);
     });
   }, [user, setUser]);
-  
-  const fetchSchool = useCallback(async (userr:UserInfo)=>{
-    await axiosInstance.get(`${ENDPOINT.DETAIL_SCHOOL}/${userr.school_id}`).then(async res=>{
+
+  const fetchSchool = useCallback(async (userr: UserInfo) => {
+    await axiosInstance.get(`${ENDPOINT.DETAIL_SCHOOL_ADMIN}/${userr.school_id}`).then(async res => {
       const getSchool: SchoolObject = res.data.data;
       const img = await getImage(getSchool.image ?? 0)
       setSchool({
@@ -70,7 +70,7 @@ export default function RootLayout({
       })
       changeFavicon(`${ENDPOINT.DETAIL_IMAGE}/${img}`);
     })
-  },[])
+  }, [])
 
   useEffect(() => {
     fetchUser();

@@ -23,6 +23,7 @@ import { PagesEnum } from "@/enums/pages.enum";
 
 interface CreateSchoolDto {
   school_name?: string;
+  school_slug?: string;
   is_demo?: boolean;
   is_active?: boolean;
   address?: string;
@@ -44,6 +45,7 @@ interface CreateSchoolDto {
 
 const initialState: CreateSchoolDto = {
   school_name: "",
+  school_slug: "",
   is_demo: false,
   is_active: true,
   address: "",
@@ -183,6 +185,18 @@ export default function Page() {
                 name="school_name"
                 placeholder="Contoh: SMAN 1 Srengat"
                 value={form.school_name}
+                onChange={handleChange}
+                required
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="school_slug">Slug Sekolah</Label>
+              <Input
+                id="school_slug"
+                name="school_slug"
+                placeholder="Contoh: smangat, smaga, smada"
+                value={form.school_slug}
                 onChange={handleChange}
                 required
                 className="mt-1"

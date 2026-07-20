@@ -38,7 +38,7 @@ export default function Page() {
 
   const fetchSchool = useCallback(async () => {
     const res = await axiosInstance.get(
-      `${ENDPOINT.DETAIL_SCHOOL}/${user.school_id}`
+      `${ENDPOINT.DETAIL_SCHOOL_ADMIN}/${user.school_id}`
     );
     setSchool(res.data.data);
     fetchImage(res.data.data);

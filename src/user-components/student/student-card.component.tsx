@@ -1,14 +1,14 @@
 import { PagePaths } from "@/enums/pages.enum";
-import { Student } from "@/objects/student.object";
+import { Student, StudentDto } from "@/objects/student.object";
 import { Hash, GraduationCap, Users, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
 export default React.forwardRef<
   HTMLDivElement,
-  { student: Student; isLoading: boolean }
+  { student: StudentDto; isLoading: boolean }
 >(function StudentCard({ student }, ref) {
-  const totalViolations = student.violations?.length || 0;
+  const totalViolations = student.violation_count || 0;
   const totalPoints = student.total_points ?? 0;
 
   // Status logic

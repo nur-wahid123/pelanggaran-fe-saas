@@ -1,4 +1,4 @@
-import { ViolationType } from "@/objects/violation-type.object";
+import { ViolationType, ViolationTypeDetailDto } from "@/objects/violation-type.object";
 import useInfiniteScroll from "../hook/useInfiniteScroll.hook";
 import ENDPOINT from "@/config/url";
 import { useRouter } from "next/navigation";
@@ -8,18 +8,16 @@ import { AlertTriangle, Users, Hash, TrendingUp } from "lucide-react";
 import { ViolationCardParameter } from "./violation-card.component";
 
 export default function ViolationTypeCard({ filter }: ViolationCardParameter) {
-    const { data, loading, ref } = useInfiniteScroll<ViolationType, HTMLDivElement>({ filter, take: 20, url: ENDPOINT.MASTER_VIOLATION })
+    const { data, loading, ref } = useInfiniteScroll<ViolationTypeDetailDto, HTMLDivElement>({ filter, take: 20, url: ENDPOINT.MASTER_VIOLATION })
     const router = useRouter();
     return (
         <div className="space-y-4 max-h-[600px] overflow-y-auto">
             {data.map((violation_type, i) => {
                 const isLastItem = data.length === i + 1;
-                const totalViolations = violation_type.violations?.length || 0;
-                const uniqueStudents = [...new Set(violation_type.violations?.flatMap(v => v.students ?? []).map(student => student?.id))].length;
-                
+
                 return (
-                    <Card 
-                        key={i} 
+                    <Card
+                        key={i}
                         ref={isLastItem ? ref : null}
                         onClick={() => router.push(`/dashboard/violation-type/${violation_type.id}`)}
                         className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50"
@@ -40,7 +38,7 @@ export default function ViolationTypeCard({ filter }: ViolationCardParameter) {
                                         </div>
                                     </div>
                                     <Badge variant="destructive" className="flex-shrink-0">
-                                        {violation_type.point} Poin
+                                        {violation_type.total_violated} Kali
                                     </Badge>
                                 </div>
 
@@ -49,15 +47,15 @@ export default function ViolationTypeCard({ filter }: ViolationCardParameter) {
                                     <div className="flex items-center gap-2">
                                         <TrendingUp className="h-4 w-4 text-blue-500" />
                                         <div>
-                                            <p className="text-sm text-muted-foreground">Total Pelanggaran</p>
-                                            <p className="font-semibold">{totalViolations} Kali</p>
+                                            <p className="text-sm text-muted-foreground">Poin</p>
+                                            <p className="font-semibold">{violation_type.point} Kali</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Users className="h-4 w-4 text-green-500" />
                                         <div>
                                             <p className="text-sm text-muted-foreground">Siswa Pelanggar</p>
-                                            <p className="font-semibold">{uniqueStudents} Siswa</p>
+                                            <p className="font-semibold">{violation_type.total_student} Siswa</p>
                                         </div>
                                     </div>
                                 </div>
@@ -68,7 +66,7 @@ export default function ViolationTypeCard({ filter }: ViolationCardParameter) {
                                     <div>
                                         <p className="text-sm text-muted-foreground">Rata-rata per siswa</p>
                                         <p className="font-semibold">
-                                            {uniqueStudents > 0 ? (totalViolations / uniqueStudents).toFixed(1) : '0'} kali
+                                            {(violation_type.total_student ?? 0) > 0 ? ((violation_type.total_violated ?? 0) / (violation_type.total_student ?? 0)).toFixed(2) : '0'} kali
                                         </p>
                                     </div>
                                 </div>
@@ -77,7 +75,7 @@ export default function ViolationTypeCard({ filter }: ViolationCardParameter) {
                     </Card>
                 );
             })}
-            
+
             {loading && (
                 <Card>
                     <CardContent className="p-8">
@@ -90,7 +88,7 @@ export default function ViolationTypeCard({ filter }: ViolationCardParameter) {
                     </CardContent>
                 </Card>
             )}
-            
+
             {data.length === 0 && !loading && (
                 <Card>
                     <CardContent className="p-8">
@@ -100,8 +98,8 @@ export default function ViolationTypeCard({ filter }: ViolationCardParameter) {
                                 {filter.search === '' ? 'Tidak ada data jenis pelanggaran' : 'Data tidak ditemukan'}
                             </h3>
                             <p className="text-muted-foreground">
-                                {filter.search === '' 
-                                    ? 'Belum ada data jenis pelanggaran untuk ditampilkan' 
+                                {filter.search === ''
+                                    ? 'Belum ada data jenis pelanggaran untuk ditampilkan'
                                     : 'Coba ubah kata kunci pencarian atau filter tanggal'
                                 }
                             </p>

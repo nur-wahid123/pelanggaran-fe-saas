@@ -10,13 +10,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 
 export function NavProjects({
-  projects,title
+  projects, title
 }: {
-  title:string,
+  title: string,
   projects: {
     name: string
     url: string
@@ -24,7 +25,7 @@ export function NavProjects({
     className?: string
   }[]
 }) {
-
+  const { toggleSidebar } = useSidebar()
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
@@ -32,7 +33,7 @@ export function NavProjects({
         {projects.map((item) => (
           <SidebarMenuItem key={item.name} className={item.className}>
             <SidebarMenuButton asChild>
-              <Link href={item.url}>
+              <Link href={item.url} onClick={toggleSidebar}>
                 <item.icon />
                 <span>{item.name}</span>
               </Link>

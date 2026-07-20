@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import ENDPOINT from "@/config/url";
 import { ViolationTypeEnum } from "@/enums/violation-type.enum";
 import { useToast } from "@/hooks/use-toast";
-import { ViolationType } from "@/objects/violation-type.object";
+import { ViolationTypeDetailDto } from "@/objects/violation-type.object";
 import { Violation } from "@/objects/violation.object";
 import useInfiniteScroll from "@/user-components/hook/useInfiniteScroll.hook";
 import EditViolationType from "@/user-components/violation-type/update-violation-type.component";
@@ -21,14 +21,14 @@ import { AppContext } from "@/user-components/contexts/app.context";
 
 export default function Page() {
     const { school } = useContext(AppContext);
-    useEffect(()=>{
-      setDocumentTitle('Detail Jenis Pelanggaran', school.name ?? "")
-    },[])
+    useEffect(() => {
+        setDocumentTitle('Detail Jenis Pelanggaran', school.name ?? "")
+    }, [])
     const params = useParams();
     const router = useRouter();
     const violationTypeId = params.slug
     const [isLoading, setIsLoading] = useState(false);
-    const [data, setData] = useState<ViolationType>({} as ViolationType);
+    const [data, setData] = useState<ViolationTypeDetailDto>({} as ViolationTypeDetailDto);
     const toaster = useToast();
 
     const fetchData = useCallback(async () => {
@@ -39,7 +39,7 @@ export default function Page() {
 
     useEffect(() => {
         fetchData();
-    }, [fetchData])
+    }, [])
 
     function handleDelete(id: number) {
         setIsLoading(true);
@@ -70,9 +70,8 @@ export default function Page() {
                 }
             });
     }
+
     const { data: dataV, loading: loadingV, ref: refV } = useInfiniteScroll<Violation, HTMLDivElement>({ filter: { violation_type_id: violationTypeId, type: ViolationTypeEnum.COLLECTION }, take: 10, url: ENDPOINT.MASTER_VIOLATION });
-    const totalStudents = data?.violations?.reduce((acc, curr) => acc + curr.students?.length, 0) || 0;
-    const totalViolations = data?.violations?.length || 0;
 
     return (
         <div className="container mx-auto p-4 space-y-6">
@@ -87,7 +86,7 @@ export default function Page() {
                         Detail jenis pelanggaran dan riwayat pelanggaran
                     </p>
                 </div>
-                
+
                 <div className="flex gap-2">
                     <EditViolationType violationTypeId={data.id} reFetch={fetchData} />
                     <Dialog>
@@ -108,8 +107,8 @@ export default function Page() {
                                 <DialogTrigger asChild>
                                     <Button variant="outline">Batal</Button>
                                 </DialogTrigger>
-                                <Button 
-                                    variant="destructive" 
+                                <Button
+                                    variant="destructive"
                                     onClick={() => handleDelete(data.id ?? 0)}
                                     disabled={isLoading}
                                 >
@@ -134,7 +133,7 @@ export default function Page() {
                         </div>
                     </CardContent>
                 </Card>
-                
+
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -146,19 +145,19 @@ export default function Page() {
                         </div>
                     </CardContent>
                 </Card>
-                
+
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
                             <Users className="h-8 w-8 text-blue-500" />
                             <div>
                                 <p className="text-sm text-muted-foreground">Siswa Pelanggar</p>
-                                <p className="font-semibold">{totalStudents} Siswa</p>
+                                <p className="font-semibold">{data.total_student ?? 0} Siswa</p>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
-                
+
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -166,7 +165,7 @@ export default function Page() {
                             <div>
                                 <p className="text-sm text-muted-foreground">Total Pelanggaran</p>
                                 <p className="font-semibold">
-                                    {totalViolations === 0 ? "Tidak Pernah" : `${totalViolations} Kali`}
+                                    {data.total_violated === 0 ? "Tidak Pernah" : `${data.total_violated} Kali`}
                                 </p>
                             </div>
                         </div>
@@ -190,7 +189,7 @@ export default function Page() {
                             const isLastItem = dataV.length === i + 1;
                             return (
                                 <Link key={i} href={`/dashboard/violation/${v.id}`}>
-                                    <Card 
+                                    <Card
                                         ref={isLastItem ? refV : null}
                                         className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50"
                                     >
@@ -219,7 +218,7 @@ export default function Page() {
                                 </Link>
                             );
                         })}
-                        
+
                         {loadingV && (
                             <Card>
                                 <CardContent className="p-8">
@@ -232,7 +231,7 @@ export default function Page() {
                                 </CardContent>
                             </Card>
                         )}
-                        
+
                         {dataV.length === 0 && !loadingV && (
                             <Card>
                                 <CardContent className="p-8">

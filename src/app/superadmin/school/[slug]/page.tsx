@@ -15,6 +15,9 @@ import {
   ShieldCheck,
   Info,
   AnnoyedIcon,
+  Edit3Icon,
+  UndoIcon,
+  Trash2Icon,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -28,6 +31,17 @@ import { formatDateToExactString } from "@/util/date.util";
 import { PagePaths, PagesEnum } from "@/enums/pages.enum";
 import { useToast } from "@/hooks/use-toast";
 import { PreviewImage } from "@/user-components/preview-image.component";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function SchoolDetailPage() {
   const { slug } = useParams() as { slug: string };
@@ -38,9 +52,20 @@ export default function SchoolDetailPage() {
   const [images, setImages] = useState<number[]>([]);
   const fetchImage = useCallback(async (school: SchoolObject) => {
     await axiosInstance.get(`${ENDPOINT.LIST_IMAGE}/${school?.image}`).then((res) => {
-        setImages(res.data.data)
+      setImages(res.data.data)
     })
-}, [school])
+  }, [school])
+
+  const deleteSchool = async () => {
+    await axiosInstance.delete(ENDPOINT.REMOVE_SCHOOL(String(school?.id))).then((res) => {
+      toaster.toast({
+        title: "Success",
+        description: "Berhasil Menghapus Sekolah",
+        variant: "default",
+      });
+      router.push("/superadmin/school");
+    })
+  }
 
   const handleImpersonate = useCallback(async (userId: number) => {
     await axiosInstance
@@ -48,6 +73,10 @@ export default function SchoolDetailPage() {
       .then((res) => {
         const token = res.data.data.access_token;
         const role = res.data.data.role as RoleEnum;
+        const slug = res.data.data.slug;
+        console.log(res);
+
+        localStorage.setItem("schoolSlug", String(slug))
 
         if (token) {
           try {
@@ -130,7 +159,7 @@ export default function SchoolDetailPage() {
   const stats = [
     {
       label: "Siswa",
-      value: school.students ? school.students.length : 0,
+      value: school.students_count,
       icon: <User className="w-4 h-4 text-blue-500" />,
       limit: school.students_limit,
       color: "text-blue-700",
@@ -146,21 +175,21 @@ export default function SchoolDetailPage() {
     },
     {
       label: "Kelas",
-      value: school.classes ? school.classes.length : 0,
+      value: school.class_count,
       icon: <BookOpen className="w-4 h-4 text-orange-500" />,
       limit: school.classes_limit,
       color: "text-orange-700",
     },
     {
       label: "Jenis Pelanggaran",
-      value: school.violation_types?.length ?? 0,
+      value: school.violation_types_count,
       icon: <ShieldCheck className="w-4 h-4 text-pink-500" />,
       limit: school.violation_type_limit,
       color: "text-pink-700",
     },
     {
       label: "Pelanggaran",
-      value: school.violations ? school.violations.length : 0,
+      value: school.violations_count,
       icon: <ShieldCheck className="w-4 h-4 text-red-500" />,
       limit: school.violation_limit,
       color: "text-red-700",
@@ -170,7 +199,7 @@ export default function SchoolDetailPage() {
   return (
     <div>
       <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
-        <PreviewImage src={`${ENDPOINT.DETAIL_IMAGE}/${images[0]}`}/>
+        <PreviewImage src={`${ENDPOINT.DETAIL_IMAGE}/${images[0]}`} />
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <h1 className="text-3xl font-bold text-primary">{school.name}</h1>
@@ -197,11 +226,10 @@ export default function SchoolDetailPage() {
             <span className="text-xs font-medium">Status:</span>
             {typeof school.is_active === "boolean" ? (
               <Badge
-                className={`text-xs px-2 py-1 ${
-                  school.is_active
-                    ? "bg-green-100 text-green-700 border-green-200"
-                    : "bg-red-100 text-red-700 border-red-200"
-                }`}
+                className={`text-xs px-2 py-1 ${school.is_active
+                  ? "bg-green-100 text-green-700 border-green-200"
+                  : "bg-red-100 text-red-700 border-red-200"
+                  }`}
                 variant="outline"
               >
                 {school.is_active ? "Aktif" : "Tidak Aktif"}
@@ -213,11 +241,10 @@ export default function SchoolDetailPage() {
             )}
             {typeof school.is_demo === "boolean" && (
               <Badge
-                className={`text-xs px-2 py-1 ${
-                  school.is_demo
-                    ? "bg-red-100 text-red-700 border-red-200"
-                    : "bg-green-100 text-green-700 border-green-200"
-                }`}
+                className={`text-xs px-2 py-1 ${school.is_demo
+                  ? "bg-red-100 text-red-700 border-red-200"
+                  : "bg-green-100 text-green-700 border-green-200"
+                  }`}
                 variant="outline"
               >
                 {school.is_demo ? "Demo" : "Full"}
@@ -291,6 +318,20 @@ export default function SchoolDetailPage() {
       </div>
       <Separator className="my-6" />
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex gap-2">
+          <Link href={PagePaths.superadminSchoolEdit(school.id ?? 0)}>
+            <Button variant="default" size="sm">
+              <Edit3Icon />
+              Edit Sekolah
+            </Button>
+          </Link>
+          <Link href={PagesEnum.SUPERADMIN_SCHOOL}>
+            <Button variant="outline" size="sm">
+              <UndoIcon />
+              Kembali
+            </Button>
+          </Link>
+        </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="font-medium">Dibuat:</span>
           <span>
@@ -301,18 +342,31 @@ export default function SchoolDetailPage() {
             )}
           </span>
         </div>
-        <div className="flex gap-2">
-          <Link href={PagePaths.superadminSchoolEdit(school.id ?? 0)}>
-            <Button variant="default" size="sm">
-              Edit Sekolah
+      </div>
+      <Separator className="my-6" />
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="sm">
+              <Trash2Icon />
+              Hapus Sekolah
             </Button>
-          </Link>
-          <Link href={PagesEnum.SUPERADMIN_SCHOOL}>
-            <Button variant="outline" size="sm">
-              Kembali
-            </Button>
-          </Link>
-        </div>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Apakah kamu yakin?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Hapus sekolah ini akan menghapus semua data yang terkait dengan sekolah ini. Termasuk data guru dan user.
+                <br />
+                {school.name}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={deleteSchool}>Continue</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
       <Separator className="my-6" />
       <div>
@@ -324,19 +378,19 @@ export default function SchoolDetailPage() {
             {school.users.map((user, idx: number) => (
               <div
                 key={user.id ?? idx}
-                className="rounded-lg border border-gray-200 bg-white dark:bg-gray-900 p-4 shadow-sm flex flex-row items-center gap-4"
+                className="rounded-lg border border-gray-200 bg-white dark:bg-gray-900 p-4 shadow-sm grid grid-cols-12 items-center gap-4"
               >
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 col-span-1">
                   <User className="w-10 h-10 text-primary bg-primary/10 rounded-full p-2" />
                 </div>
-                <div className="flex flex-col flex-1 min-w-0">
+                <div className="flex flex-col flex-1 min-w-0 col-span-4">
                   <div className="font-semibold text-base truncate">
                     {user.name || (
                       <span className="italic text-muted-foreground">-</span>
                     )}
                   </div>
                 </div>
-                <div className="flex flex-col gap-1 text-sm min-w-[120px]">
+                <div className="flex flex-col gap-1 text-sm min-w-[120px] col-span-5">
                   <div>
                     <span className="font-medium">Email:</span>{" "}
                     {user.email || (
@@ -347,18 +401,18 @@ export default function SchoolDetailPage() {
                     <span className="font-medium">Role:</span>{" "}
                     <Badge variant="secondary">
                       {user.role &&
-                      RoleEnum[user.role as unknown as keyof typeof RoleEnum]
+                        RoleEnum[user.role as unknown as keyof typeof RoleEnum]
                         ? RoleEnum[
-                            user.role as unknown as keyof typeof RoleEnum
-                          ]
+                        user.role as unknown as keyof typeof RoleEnum
+                        ]
                         : user.role || <span className="italic">-</span>}
                     </Badge>
                   </div>
                   <div>
-                    <span className="font-medium">Status:</span>{" "}
+                    <span className="font-medium">Status: </span>{user.is_active ? "Aktif ✅" : "Tidak Aktif ❌"}
                   </div>
                 </div>
-                <div>
+                <div className="flex items-center justify-end col-span-2">
                   <Button onClick={() => handleImpersonate(user?.id ?? 0)}>
                     <AnnoyedIcon className="w-4 h-4 mr-2" />
                     Impersonate

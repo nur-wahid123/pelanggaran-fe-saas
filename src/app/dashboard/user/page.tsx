@@ -51,9 +51,9 @@ function violationCountBadge(count: number) {
 
 export default function Page() {
     const { school } = useContext(AppContext);
-    useEffect(()=>{
-      setDocumentTitle('User', school.name ?? "")
-    },[])
+    useEffect(() => {
+        setDocumentTitle('User', school.name ?? "")
+    }, [])
     const [search, setSearch] = useState("");
     const { data, loading, ref, refresh: reFetch } = useInfiniteScroll<User, HTMLDivElement>({ filter: { search }, take: 20, url: config.url });
 
@@ -75,7 +75,7 @@ export default function Page() {
                 <div className="max-h-[31rem] gap-3 w-full overflow-x-auto overflow-y-auto flex flex-col py-2">
                     {data.map((user, index) => {
                         const isLast = data.length === index + 1;
-                        const violationCount = Array.isArray((user as any).violations) ? (user as any).violations.length : 0;
+                        const violationCount = user.total_violation ?? 0
                         return (
                             <div
                                 ref={isLast ? ref : undefined}

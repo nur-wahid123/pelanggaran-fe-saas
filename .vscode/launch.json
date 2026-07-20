@@ -5,7 +5,7 @@
         "name": "Next.js: dev",
         "type": "node-terminal",
         "request": "launch",
-        "command": "npm run dev2"
+        "command": "npm run dev"
       },
       {
         "name": "Next.js: debug client-side",

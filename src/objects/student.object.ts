@@ -19,3 +19,23 @@ export class Student {
 
   public school?: SchoolObject;
 }
+
+export class StudentDto {
+  public id?: number;
+
+  public total_points?: number;
+
+  public violation_count?: number;
+
+  public name?: string;
+
+  public school_student_id?: string;
+
+  public national_student_id?: string;
+
+  public violations?: Violation[];
+
+  public student_class?: ClassObject;
+
+  public school?: SchoolObject;
+}

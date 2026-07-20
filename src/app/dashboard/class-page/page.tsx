@@ -15,9 +15,9 @@ import { useCallback, useContext, useEffect, useState } from "react";
 
 export default function Page() {
     const { school } = useContext(AppContext);
-    useEffect(()=>{
-      setDocumentTitle('Kelas', school.name ?? "")
-    },[])
+    useEffect(() => {
+        setDocumentTitle('Kelas', school.name ?? "")
+    }, [])
     const [search, setSearch] = useState("");
     const toaster = useToast();
     const { data: classes, loading, ref, refresh: reFetch } = useInfiniteScroll<ClassObject, HTMLDivElement>({
@@ -112,7 +112,7 @@ export default function Page() {
                                         <div className="flex gap-2 items-center mt-1">
                                             <Users className="h-4 w-4 text-purple-500" />
                                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                {classObject.students?.length ?? 0} Siswa
+                                                {classObject.total_student ?? 0} Siswa
                                             </span>
                                         </div>
                                     </div>

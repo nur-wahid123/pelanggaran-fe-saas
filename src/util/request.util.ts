@@ -17,7 +17,6 @@ export function logout() {
   if (typeof window !== "undefined") {
     Cookies.remove("token");
     localStorage.removeItem("token");
-    window.location.href = "/login";
   }
 }
 
@@ -39,9 +38,14 @@ axiosInstance.interceptors.response.use(
 
     if (status === 401) {
       if (typeof window !== "undefined") {
+        const slug = localStorage.getItem("schoolSlug");
         Cookies.remove("token");
         localStorage.removeItem("token");
-        window.location.href = "/login";
+        if (slug) {
+          window.location.href = `/login/${slug}`;
+        } else {
+          window.location.href = "/login";
+        }
       }
     }
 

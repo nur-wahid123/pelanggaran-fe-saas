@@ -11,6 +11,8 @@ export interface User {
 
   password?: string;
 
+  is_active?: boolean;
+
   email?: string;
 
   role?: RoleEnum;
@@ -18,5 +20,7 @@ export interface User {
   violations?: Violation[];
 
   school?: SchoolObject;
+
+  total_violation?: number;
 
 }

@@ -1,4 +1,4 @@
-import { Student } from "@/objects/student.object";
+import { Student, StudentDto } from "@/objects/student.object";
 import useInfiniteScroll from "../hook/useInfiniteScroll.hook";
 import ENDPOINT from "@/config/url";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,19 +7,17 @@ import { Users, AlertTriangle, Hash, GraduationCap } from "lucide-react";
 import { ViolationCardParameter } from "./violation-card.component";
 
 export default function StudentCard({ filter }: ViolationCardParameter) {
-    const { data, loading, ref } = useInfiniteScroll<Student, HTMLDivElement>({ filter, take: 20, url: ENDPOINT.MASTER_VIOLATION })
+    const { data, loading, ref } = useInfiniteScroll<StudentDto, HTMLDivElement>({ filter, take: 20, url: ENDPOINT.MASTER_VIOLATION })
     return (
         <div className="space-y-4 max-h-[600px] overflow-y-auto">
             {data.map((student, i) => {
                 const isLastItem = data.length === i + 1;
-                const totalViolations = student.violations?.length || 0;
-                const totalPoints = student.violations?.reduce((acc, curr) => 
-                    acc + curr.violation_types?.reduce((acc, curr) => acc + curr.point, 0), 0
-                ) || 0;
-                
+                const totalViolations = student.violation_count || 0;
+                const totalPoints = student.total_points || 0;
+
                 return (
-                    <Card 
-                        key={i} 
+                    <Card
+                        key={i}
                         ref={isLastItem ? ref : null}
                         className="hover:shadow-lg transition-all duration-200 hover:border-primary/50"
                     >
@@ -73,9 +71,9 @@ export default function StudentCard({ filter }: ViolationCardParameter) {
                                         <div>
                                             <p className="text-sm text-muted-foreground">Status</p>
                                             <p className="font-semibold">
-                                                {totalPoints > 30 ? 'Perhatian Tinggi' : 
-                                                 totalPoints > 15 ? 'Perhatian Sedang' : 
-                                                 totalPoints > 0 ? 'Perhatian Rendah' : 'Tidak ada pelanggaran'}
+                                                {totalPoints > 30 ? 'Perhatian Tinggi' :
+                                                    totalPoints > 15 ? 'Perhatian Sedang' :
+                                                        totalPoints > 0 ? 'Perhatian Rendah' : 'Tidak ada pelanggaran'}
                                             </p>
                                         </div>
                                     </div>
@@ -85,7 +83,7 @@ export default function StudentCard({ filter }: ViolationCardParameter) {
                     </Card>
                 );
             })}
-            
+
             {loading && (
                 <Card>
                     <CardContent className="p-8">
@@ -98,7 +96,7 @@ export default function StudentCard({ filter }: ViolationCardParameter) {
                     </CardContent>
                 </Card>
             )}
-            
+
             {data.length === 0 && !loading && (
                 <Card>
                     <CardContent className="p-8">
@@ -108,8 +106,8 @@ export default function StudentCard({ filter }: ViolationCardParameter) {
                                 {filter.search === '' ? 'Tidak ada data siswa' : 'Data tidak ditemukan'}
                             </h3>
                             <p className="text-muted-foreground">
-                                {filter.search === '' 
-                                    ? 'Belum ada data siswa untuk ditampilkan' 
+                                {filter.search === ''
+                                    ? 'Belum ada data siswa untuk ditampilkan'
                                     : 'Coba ubah kata kunci pencarian atau filter tanggal'
                                 }
                             </p>

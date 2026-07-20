@@ -4,8 +4,10 @@ const ENDPOINT = {
   //School
   SCHOOL_CREATE: `${CONFIG.BASE_URL}/school/create`,
   DETAIL_SCHOOL: `${CONFIG.BASE_URL}/school/detail`,
+  DETAIL_SCHOOL_ADMIN: `${CONFIG.BASE_URL}/school/detail-admin`,
+  SLUG_SCHOOL: (slug: string) => `${CONFIG.BASE_URL}/school/by-slug/${slug}`,
   MASTER_SCHOOL: `${CONFIG.BASE_URL}/school/list`,
-  REMOVE_SCHOOL: `${CONFIG.BASE_URL}/school/remove`,
+  REMOVE_SCHOOL: (slug: string) => `${CONFIG.BASE_URL}/school/remove/${slug}`,
   UPDATE_SCHOOL: `${CONFIG.BASE_URL}/school/update`,
   ADMIN_UPDATE_SCHOOL: `${CONFIG.BASE_URL}/school/admin/update`,
   IMPERSONATE_USER: `${CONFIG.BASE_URL}/auth/impersonate-login`,

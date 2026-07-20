@@ -61,7 +61,7 @@ export default function StudentAndViolationInput() {
   } = useInfiniteScroll<Student, HTMLTableRowElement>({
     filter: { search: search.student },
     take: 20,
-    url: ENDPOINT.MASTER_STUDENT,
+    url: ENDPOINT.MASTER_STUDENT_SEARCH,
   });
 
   const {
@@ -140,7 +140,7 @@ export default function StudentAndViolationInput() {
               (progressEvent.loaded * 100) / (progressEvent.total ?? 0)
             ) /
               100) *
-              50 +
+            50 +
             40;
           setProgress(percentCompleted > 90 ? 90 : percentCompleted);
         },
@@ -167,7 +167,7 @@ export default function StudentAndViolationInput() {
           variant: "destructive",
         });
         setIsLoading(false);
-      }).finally(()=>{
+      }).finally(() => {
         // setIsLoading(false);
         setSearch({ ...search, student: "", violation: "" });
         setProgress(0);

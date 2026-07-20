@@ -1,4 +1,4 @@
-import { ViolationType } from "@/objects/violation-type.object";
+import { ViolationTypeDetailDto } from "@/objects/violation-type.object";
 import { toTitleCase } from "@/util/util";
 import Link from "next/link";
 import { AlertTriangle, TrendingUp, Users, Hash, Star } from "lucide-react";
@@ -9,21 +9,11 @@ export default function ViolationTypeCard({
 }: {
   reFetch: () => void;
   isLoading: boolean;
-  violationType: ViolationType;
+  violationType: ViolationTypeDetailDto;
   ref?: any;
 }) {
-  const totalViolations = violationType.violations?.length || 0;
-  const uniqueStudents = [
-    ...new Set(
-      violationType.violations
-        ?.flatMap((v) => v.students ?? [])
-        .map((student) => student?.id)
-    ),
-  ].length;
-  const avgPerStudent =
-    uniqueStudents > 0
-      ? (totalViolations / uniqueStudents).toFixed(1)
-      : "0";
+
+  const avgPerStudent = Number(((violationType?.total_violated ?? 0) / (violationType?.total_student ?? 0)).toFixed(2));
 
   return (
     <Link
@@ -48,7 +38,7 @@ export default function ViolationTypeCard({
           </div>
         </div>
         <div className="flex flex-col items-end gap-1 min-w-[120px]">
-          {totalViolations === 0 ? (
+          {violationType.total_violated === 0 ? (
             <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-semibold flex items-center gap-1">
               <Users className="h-3 w-3" />
               Tidak Pernah Dilanggar
@@ -56,7 +46,7 @@ export default function ViolationTypeCard({
           ) : (
             <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700 font-semibold flex items-center gap-1">
               <TrendingUp className="h-3 w-3" />
-              {totalViolations} Kali Dilanggar
+              {violationType.total_violated} Kali Dilanggar
             </span>
           )}
         </div>
@@ -65,13 +55,13 @@ export default function ViolationTypeCard({
         <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-lg">
           <TrendingUp className="h-4 w-4 text-blue-500" />
           <span className="text-sm text-blue-700 dark:text-blue-200 font-medium">
-            {totalViolations} Pelanggaran
+            {violationType.total_violated} Pelanggaran
           </span>
         </div>
         <div className="flex items-center gap-2 bg-green-50 dark:bg-green-900/30 px-3 py-1 rounded-lg">
           <Users className="h-4 w-4 text-green-500" />
           <span className="text-sm text-green-700 dark:text-green-200 font-medium">
-            {uniqueStudents} Siswa
+            {violationType.total_student} Siswa
           </span>
         </div>
         <div className="flex items-center gap-2 bg-purple-50 dark:bg-purple-900/30 px-3 py-1 rounded-lg">

@@ -29,6 +29,7 @@ import {
 import { logout } from "@/util/request.util"
 import Link from "next/link"
 import { UserInfo } from "@/objects/user-info.object"
+import { useRouter } from "next/navigation"
 
 export function NavUser({
   user,
@@ -38,12 +39,22 @@ export function NavUser({
   const { isMobile } = useSidebar()
   const initials = user.name
     ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-    : "U"
-
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+    : "U";
+  const router = useRouter()
+  const logouto = () => {
+    const slug = localStorage.getItem("schoolSlug");
+    console.log(slug);
+    logout()
+    if (slug) {
+      router.push(`/login/${slug}`);
+    } else {
+      router.push('/login');
+    }
+  }
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -97,7 +108,7 @@ export function NavUser({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => logout()}
+              onClick={() => { logouto() }}
               className="flex items-center gap-2 text-destructive"
               aria-label="Log out"
             >

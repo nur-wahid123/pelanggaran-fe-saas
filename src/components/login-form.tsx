@@ -9,11 +9,12 @@ import ENDPOINT from "@/config/url";
 import { Eye, EyeOff, User, Lock, LogIn, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { RoleEnum } from "@/enums/role.enum";
+import { SchoolObject } from "@/objects/school.object";
 
 export function LoginForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+  comp,
+  school
+}: { comp: React.ComponentPropsWithoutRef<"div">, school?: SchoolObject | null }) {
   const router = useRouter();
   const [isView, setIsView] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +29,7 @@ export function LoginForm({
     setIsLoading(true);
 
     await axios
-      .post(`${ENDPOINT.LOGIN}`, state)
+      .post(`${ENDPOINT.LOGIN}`, { ...state, slug: school?.slug })
       .then(async (res) => {
         const token = res.data.data.access_token;
         const role = res.data.data.role as RoleEnum;
@@ -67,7 +68,7 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("w-full", className)} {...props}>
+    <div className={cn("w-full", comp.className)} {...comp}>
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Username Field */}
         <div className="space-y-2">

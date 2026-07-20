@@ -1,6 +1,6 @@
 'use client'
 import ENDPOINT from "@/config/url";
-import { ViolationType } from "@/objects/violation-type.object";
+import { ViolationType, ViolationTypeDetailDto } from "@/objects/violation-type.object";
 import { AppContext } from "@/user-components/contexts/app.context";
 import useInfiniteScroll from "@/user-components/hook/useInfiniteScroll.hook";
 import SearchBar from "@/user-components/ui/search-bar";
@@ -12,11 +12,11 @@ import { useContext, useEffect, useState } from "react";
 
 export default function Page() {
     const { school } = useContext(AppContext);
-    useEffect(()=>{
-      setDocumentTitle('Jenis Pelanggaran', school.name ?? "")
-    },[])
+    useEffect(() => {
+        setDocumentTitle('Jenis Pelanggaran', school.name ?? "")
+    }, [])
     const [search, setSearch] = useState("");
-    const { data: violationTypes, loading, ref, refresh } = useInfiniteScroll<ViolationType, HTMLTableRowElement>({ filter: { search }, take: 20, url: ENDPOINT.MASTER_VIOLATION_TYPE })
+    const { data: violationTypes, loading, ref, refresh } = useInfiniteScroll<ViolationTypeDetailDto, HTMLTableRowElement>({ filter: { search }, take: 20, url: ENDPOINT.MASTER_VIOLATION_TYPE })
     function handleSearch(query: string) {
         if (query !== search) {
             setSearch(query);

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ENDPOINT from "@/config/url";
 import { ViolationTypeEnum } from "@/enums/violation-type.enum";
-import { Student } from "@/objects/student.object";
+import { Student, StudentDto } from "@/objects/student.object";
 import { Violation } from "@/objects/violation.object";
 import useInfiniteScroll from "@/user-components/hook/useInfiniteScroll.hook";
 import { formatDateToExactString, formatDateToExactTime } from "@/util/date.util";
@@ -18,14 +18,14 @@ import { setDocumentTitle } from "@/util/util";
 
 export default function Page() {
     const { school } = useContext(AppContext);
-    useEffect(()=>{
-      setDocumentTitle('Detail Siswa', school.name ?? "")
-    },[])
+    useEffect(() => {
+        setDocumentTitle('Detail Siswa', school.name ?? "")
+    }, [])
     const param = useParams()
     const studentId = useMemo<string>(() => {
         return String(param.slug)
     }, [param])
-    const [student, setStudent] = useState<Student | undefined>(undefined);
+    const [student, setStudent] = useState<StudentDto | undefined>(undefined);
     const fetchData = useCallback(async () => {
         await axiosInstance.get(`${ENDPOINT.DETAIL_STUDENT}/${studentId}`).then((res) => {
             setStudent(res.data.data)
@@ -35,9 +35,9 @@ export default function Page() {
         fetchData();
     }, [])
     const { data: dataV, loading: loadingV, ref: refV } = useInfiniteScroll<Violation, HTMLDivElement>({ filter: { student_id: student?.id, type: ViolationTypeEnum.COLLECTION }, take: 10, url: ENDPOINT.MASTER_VIOLATION });
-    
-    const totalPoints = dataV.length === 0 ? 0 : dataV?.reduce((acc, curr) => acc + curr.violation_types?.reduce((acc, curr) => acc + curr.point, 0), 0);
-    const totalViolations = dataV.length;
+
+    const totalPoints = student?.total_points ?? 0;
+    const totalViolations = student?.violation_count ?? 0;
 
     return (
         <div className="container mx-auto p-4 space-y-6">
@@ -67,7 +67,7 @@ export default function Page() {
                         </div>
                     </CardContent>
                 </Card>
-                
+
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ export default function Page() {
                         </div>
                     </CardContent>
                 </Card>
-                
+
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -91,7 +91,7 @@ export default function Page() {
                         </div>
                     </CardContent>
                 </Card>
-                
+
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export default function Page() {
                         </div>
                     </CardContent>
                 </Card>
-                
+
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -115,7 +115,7 @@ export default function Page() {
                         </div>
                     </CardContent>
                 </Card>
-                
+
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ export default function Page() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Calendar className="h-5 w-5" />
-                        Riwayat Pelanggaran ({dataV.length})
+                        Riwayat Pelanggaran ({student?.violation_count})
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -144,10 +144,10 @@ export default function Page() {
                         {dataV.map((v, i) => {
                             const isLastItem = dataV.length === i + 1;
                             const violationPoints = v.violation_types?.reduce((acc, curr) => acc + curr.point, 0) || 0;
-                            
+
                             return (
                                 <Link key={i} href={`/dashboard/violation/${v.id}`}>
-                                    <Card 
+                                    <Card
                                         ref={isLastItem ? refV : null}
                                         className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50"
                                     >
@@ -179,7 +179,7 @@ export default function Page() {
                                 </Link>
                             );
                         })}
-                        
+
                         {loadingV && (
                             <Card>
                                 <CardContent className="p-8">
@@ -192,7 +192,7 @@ export default function Page() {
                                 </CardContent>
                             </Card>
                         )}
-                        
+
                         {dataV.length === 0 && !loadingV && (
                             <Card>
                                 <CardContent className="p-8">

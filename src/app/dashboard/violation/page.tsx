@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ViolationTypeEnum } from "@/enums/violation-type.enum";
@@ -85,7 +86,7 @@ export default function Page() {
         return { text: "", icon: FileText, description: "" };
     }
   };
-  
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       {/* Header Section */}

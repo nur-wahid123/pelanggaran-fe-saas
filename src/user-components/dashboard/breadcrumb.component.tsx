@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { HomeIcon } from "lucide-react"
 import React from "react"
+import Link from "next/link"
 
 export function AppBreadcrumb() {
     const pathname = usePathname()
@@ -36,9 +37,9 @@ export function AppBreadcrumb() {
                         return (
                             <React.Fragment key={href}>
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink href={href} className="capitalize">
+                                    <Link href={href} className="capitalize">
                                         {segment}
-                                    </BreadcrumbLink>
+                                    </Link>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                             </React.Fragment>

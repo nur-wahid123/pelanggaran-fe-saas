@@ -9,4 +9,6 @@ export class ClassObject {
   students?: Student[];
 
   school?: SchoolObject;
+
+  total_student?: number;
 }
