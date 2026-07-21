@@ -32,8 +32,10 @@ import { UserInfo } from "@/objects/user-info.object"
 import { useRouter } from "next/navigation"
 
 export function NavUser({
+  isSuperadmin = false,
   user,
 }: {
+  isSuperadmin?: boolean
   user: UserInfo
 }) {
   const { isMobile } = useSidebar()
@@ -96,7 +98,7 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link className="flex items-center gap-2" href={`/dashboard/profile`}>
+              <Link className="flex items-center gap-2" href={isSuperadmin ? `/superadmin/profile` : `/dashboard/profile`}>
                 <User2Icon className="size-4" aria-hidden="true" />
                 <span>Profil</span>
               </Link>

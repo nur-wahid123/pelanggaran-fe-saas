@@ -59,7 +59,7 @@ export function AppSidebarSuper({ ...props }: React.ComponentProps<typeof Sideba
         <NavProjects title="User" projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser isSuperadmin={true} user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
