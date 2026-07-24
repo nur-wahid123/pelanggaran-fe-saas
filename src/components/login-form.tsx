@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import ENDPOINT from "@/config/url";
@@ -23,6 +23,31 @@ export function LoginForm({
     password: "",
   });
   const toaster = useToast();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const pathSegments = window.location.pathname.split('/');
+      if (pathSegments.length >= 3 && pathSegments[1] === "login" && pathSegments[2]) {
+        const searchParams = new URLSearchParams(window.location.search);
+        const usernameParam = searchParams.get("username");
+        const passwordParam = searchParams.get("password");
+
+        if (usernameParam || passwordParam) {
+          setState({
+            username: usernameParam || "",
+            password: passwordParam || "",
+          });
+
+          // Clean up URL parameters
+          searchParams.delete("username");
+          searchParams.delete("password");
+          const newSearch = searchParams.toString();
+          const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ""}`;
+          window.history.replaceState(null, "", newUrl);
+        }
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
