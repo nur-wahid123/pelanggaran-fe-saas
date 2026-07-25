@@ -31,6 +31,7 @@ import { formatDateToExactString } from "@/util/date.util";
 import { PagePaths, PagesEnum } from "@/enums/pages.enum";
 import { useToast } from "@/hooks/use-toast";
 import { PreviewImage } from "@/user-components/preview-image.component";
+import { setDocumentTitle } from "@/util/util";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -119,6 +120,7 @@ export default function SchoolDetailPage() {
           `${ENDPOINT.DETAIL_SCHOOL}/${slug}`
         );
         setSchool(res.data.data);
+        setDocumentTitle('Detail Sekolah', res.data.data.name ?? '');
         fetchImage(res.data.data);
       } catch (e) {
         console.error(e);
@@ -239,7 +241,17 @@ export default function SchoolDetailPage() {
                 Tidak diketahui
               </Badge>
             )}
-            {typeof school.is_demo === "boolean" && (
+            {school.mode?.name ? (
+              <Badge
+                className={`text-xs px-2 py-1 ${school.is_demo
+                  ? "bg-red-100 text-red-700 border-red-200"
+                  : "bg-green-100 text-green-700 border-green-200"
+                  }`}
+                variant="outline"
+              >
+                Mode: {school.mode.name}
+              </Badge>
+            ) : typeof school.is_demo === "boolean" && (
               <Badge
                 className={`text-xs px-2 py-1 ${school.is_demo
                   ? "bg-red-100 text-red-700 border-red-200"

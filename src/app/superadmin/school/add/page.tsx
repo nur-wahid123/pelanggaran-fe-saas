@@ -1,12 +1,19 @@
 "use client";
 import * as React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   CalendarDays,
   School,
@@ -19,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import ENDPOINT from "@/config/url";
 import { useRouter } from "next/navigation";
+import { setDocumentTitle } from "@/util/util";
 import { PagesEnum } from "@/enums/pages.enum";
 
 interface CreateSchoolDto {
@@ -41,6 +49,7 @@ interface CreateSchoolDto {
   user_name?: string;
   user_email?: string;
   user_password?: string;
+  mode_id?: number;
 }
 
 const initialState: CreateSchoolDto = {
@@ -54,15 +63,16 @@ const initialState: CreateSchoolDto = {
   email: "",
   image: null,
   start_date: null,
-  students_limit: 1000,
-  violation_limit: 100,
+  students_limit: 500,
+  violation_limit: 5000,
   classes_limit: 30,
-  user_limit: 10,
-  violation_type_limit: 10,
+  user_limit: 20,
+  violation_type_limit: 50,
   user_username: "",
   user_name: "",
   user_email: "",
   user_password: "",
+  mode_id: undefined,
 };
 
 export default function Page() {
@@ -72,6 +82,50 @@ export default function Page() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const router = useRouter();
+  const [modes, setModes] = useState<any[]>([]);
+
+  useEffect(() => {
+    setDocumentTitle('Tambah Sekolah', 'Superadmin');
+    const fetchModes = async () => {
+      try {
+        const response = await axiosInstance.get(ENDPOINT.SCHOOL_MODES_LIST);
+        setModes(response.data.data);
+        if (response.data.data.length > 0) {
+          const defaultMode = response.data.data.find((m: any) => m.name === 'Normal') || response.data.data[0];
+          setForm((prev) => ({
+            ...prev,
+            mode_id: defaultMode.id,
+            is_demo: defaultMode.is_demo,
+            students_limit: defaultMode.students_limit,
+            violation_limit: defaultMode.violation_limit,
+            classes_limit: defaultMode.classes_limit,
+            user_limit: defaultMode.user_limit,
+            violation_type_limit: defaultMode.violation_type_limit,
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to fetch school modes", err);
+      }
+    };
+    fetchModes();
+  }, []);
+
+  const handleModeChange = (modeIdStr: string) => {
+    const modeId = Number(modeIdStr);
+    const selectedMode = modes.find((m) => m.id === modeId);
+    if (selectedMode) {
+      setForm((prev) => ({
+        ...prev,
+        mode_id: modeId,
+        is_demo: selectedMode.is_demo,
+        students_limit: selectedMode.students_limit,
+        violation_limit: selectedMode.violation_limit,
+        classes_limit: selectedMode.classes_limit,
+        user_limit: selectedMode.user_limit,
+        violation_type_limit: selectedMode.violation_type_limit,
+      }));
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -303,16 +357,23 @@ export default function Page() {
               />
             </div>
             <div>
-              <Label htmlFor="is_demo">Demo Mode</Label>
-              <div className="flex items-center gap-2 mt-1">
-                <Switch
-                  id="is_demo"
-                  checked={form.is_demo}
-                  onCheckedChange={(v) => handleSwitch("is_demo", v)}
-                />
-                <span className="text-sm text-muted-foreground">
-                  Aktifkan mode demo
-                </span>
+              <Label htmlFor="mode_id">Mode Sekolah</Label>
+              <div className="mt-1">
+                <Select
+                  value={form.mode_id ? String(form.mode_id) : ""}
+                  onValueChange={handleModeChange}
+                >
+                  <SelectTrigger id="mode_id" className="w-full">
+                    <SelectValue placeholder="Pilih Mode Sekolah" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {modes.map((m) => (
+                      <SelectItem key={m.id} value={String(m.id)}>
+                        {m.name} {m.description ? `- ${m.description}` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div>
@@ -337,9 +398,8 @@ export default function Page() {
                   id="students_limit"
                   name="students_limit"
                   type="number"
-                  min={1}
                   value={form.students_limit}
-                  onChange={handleChange}
+                  disabled={true}
                   className="mt-1"
                 />
               </div>
@@ -349,9 +409,8 @@ export default function Page() {
                   id="violation_limit"
                   name="violation_limit"
                   type="number"
-                  min={1}
                   value={form.violation_limit}
-                  onChange={handleChange}
+                  disabled={true}
                   className="mt-1"
                 />
               </div>
@@ -361,9 +420,8 @@ export default function Page() {
                   id="classes_limit"
                   name="classes_limit"
                   type="number"
-                  min={1}
                   value={form.classes_limit}
-                  onChange={handleChange}
+                  disabled={true}
                   className="mt-1"
                 />
               </div>
@@ -373,9 +431,8 @@ export default function Page() {
                   id="user_limit"
                   name="user_limit"
                   type="number"
-                  min={1}
                   value={form.user_limit}
-                  onChange={handleChange}
+                  disabled={true}
                   className="mt-1"
                 />
               </div>
@@ -385,9 +442,8 @@ export default function Page() {
                   id="violation_type_limit"
                   name="violation_type_limit"
                   type="number"
-                  min={1}
                   value={form.violation_type_limit}
-                  onChange={handleChange}
+                  disabled={true}
                   className="mt-1"
                 />
               </div>

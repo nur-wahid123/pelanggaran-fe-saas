@@ -45,6 +45,12 @@ const data = {
       icon: SchoolIcon,
       className: "font-medium",
     },
+    {
+      name: "Mode Sekolah",
+      url: "/superadmin/school-modes",
+      icon: GalleryVerticalEnd,
+      className: "font-medium",
+    },
   ],
 }
 

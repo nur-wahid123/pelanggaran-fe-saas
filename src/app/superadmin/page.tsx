@@ -10,6 +10,7 @@ import {SuperadminDashboardDataObject} from "@/objects/superadmin-dashboard-data
 import {axiosInstance} from "@/util/request.util";
 import ENDPOINT from "@/config/url";
 import {StatsObject} from "@/objects/stats.object";
+import { setDocumentTitle } from "@/util/util";
 
 
 export default function page() {
@@ -65,6 +66,7 @@ export default function page() {
     },[setData])
 
     useEffect(() => {
+        setDocumentTitle('Dashboard', 'Superadmin');
         fetchData()
     }, []);
 

@@ -6,10 +6,15 @@ import useInfiniteScroll from "@/user-components/hook/useInfiniteScroll.hook";
 import SchoolCard from "@/user-components/school/school-card.component";
 import { PlusIcon, School as SchoolIcon, Loader2, XIcon } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import SearchBar from "@/user-components/ui/search-bar";
+import { setDocumentTitle } from "@/util/util";
 
 export default function Page() {
+  useEffect(() => {
+    setDocumentTitle('Daftar Sekolah', 'Superadmin');
+  }, []);
+
   const [search, setSearch] = useState("");
   const { data, loading, ref } = useInfiniteScroll<
     SchoolObject,

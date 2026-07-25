@@ -14,6 +14,13 @@ const ENDPOINT = {
   //IsDemo
   IS_DEMO: `${CONFIG.BASE_URL}/school/isdemo`,
 
+  //School Modes
+  SCHOOL_MODES_LIST: `${CONFIG.BASE_URL}/school-modes/list`,
+  SCHOOL_MODES_DETAIL: (id: number) => `${CONFIG.BASE_URL}/school-modes/detail/${id}`,
+  SCHOOL_MODES_CREATE: `${CONFIG.BASE_URL}/school-modes/create`,
+  SCHOOL_MODES_UPDATE: (id: number) => `${CONFIG.BASE_URL}/school-modes/update/${id}`,
+  SCHOOL_MODES_DELETE: (id: number) => `${CONFIG.BASE_URL}/school-modes/delete/${id}`,
+
   //Student
   STUDENT_CREATE_BATCH: `${CONFIG.BASE_URL}/student/create-batch`,
   STUDENT_CREATE: `${CONFIG.BASE_URL}/student/create`,

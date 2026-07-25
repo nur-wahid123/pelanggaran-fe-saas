@@ -3,6 +3,7 @@ import { Student } from "./student.object";
 import { User } from "./user.object";
 import { ViolationType } from "./violation-type.object";
 import { Violation } from "./violation.object";
+import { SchoolModeObject } from "./school-mode.object";
 
 export class SchoolObject {
   public id?: number;
@@ -30,6 +31,8 @@ export class SchoolObject {
   public users?: User[];
   public violations?: Violation[];
   public violation_types?: ViolationType[];
+  public mode_id?: number;
+  public mode?: SchoolModeObject;
   public created_at?: Date;
   public updated_at?: Date;
   public deleted_at?: Date;

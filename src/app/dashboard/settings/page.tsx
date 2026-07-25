@@ -17,6 +17,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { SchoolObject } from "@/objects/school.object";
 import { AppContext } from "@/user-components/contexts/app.context";
 import DeleteAllViolations from "@/user-components/violation/delete-all-violations.component";
+import { setDocumentTitle } from "@/util/util";
 
 export default function Page() {
   const { user, isLoading, refreshData } = useContext(AppContext);
@@ -41,6 +42,7 @@ export default function Page() {
       `${ENDPOINT.DETAIL_SCHOOL_ADMIN}/${user.school_id}`
     );
     setSchool(res.data.data);
+    setDocumentTitle('Pengaturan Sekolah', res.data.data.name ?? '');
     fetchImage(res.data.data);
   }, [isLoading]);
   useEffect(() => {

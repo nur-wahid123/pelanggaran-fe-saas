@@ -8,7 +8,7 @@ import React, { useEffect } from "react"
 export default function LoginPage() {
 
   useEffect(() => {
-    setDocumentTitle("Login", '')
+    setDocumentTitle("Login Superadmin", 'APELSI')
     if (typeof window !== "undefined") {
       localStorage.removeItem("schoolSlug");
     }

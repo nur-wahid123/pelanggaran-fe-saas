@@ -22,7 +22,7 @@ export default function LoginPage() {
       }
       try {
         const response = await axios.get(ENDPOINT.SLUG_SCHOOL(schoolSlug))
-        setDocumentTitle("Login", response.data.data.name)
+        setDocumentTitle("Login Sekolah", response.data.data.name)
         setSchool(response.data.data)
       } catch (error) {
         console.error(error)

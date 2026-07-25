@@ -7,12 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CheckIcon, Loader2, Save } from "lucide-react";
 import { axiosInstance } from "@/util/request.util";
 import ENDPOINT from "@/config/url";
 import { useToast } from "@/hooks/use-toast";
 import { PagePaths } from "@/enums/pages.enum";
 import { SchoolObject } from "@/objects/school.object";
+import { SchoolModeObject } from "@/objects/school-mode.object";
+import { setDocumentTitle } from "@/util/util";
 
 export default function EditSchoolPage() {
   const router = useRouter();
@@ -23,20 +32,53 @@ export default function EditSchoolPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modes, setModes] = useState<SchoolModeObject[]>([]);
 
-  const fetchSchool = useCallback(async ()=> {
+  const fetchModes = useCallback(async () => {
+    try {
+      const response = await axiosInstance.get(ENDPOINT.SCHOOL_MODES_LIST);
+      setModes(response.data.data);
+    } catch (err) {
+      console.error("Failed to fetch school modes", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchModes();
+  }, [fetchModes]);
+
+  const handleModeChange = (modeIdStr: string) => {
+    if (!school) return;
+    const modeId = Number(modeIdStr);
+    const selectedMode = modes.find((m) => m.id === modeId);
+    if (selectedMode) {
+      setSchool({
+        ...school,
+        mode_id: modeId,
+        is_demo: selectedMode.is_demo,
+        students_limit: selectedMode.students_limit,
+        violation_limit: selectedMode.violation_limit,
+        classes_limit: selectedMode.classes_limit,
+        user_limit: selectedMode.user_limit,
+        violation_type_limit: selectedMode.violation_type_limit,
+      });
+    }
+  };
+
+  const fetchSchool = useCallback(async () => {
     try {
       const res = await axiosInstance.get(
         `${ENDPOINT.DETAIL_SCHOOL}/${slug}`
       );
       setSchool(res.data.data);
+      setDocumentTitle('Edit Sekolah', res.data.data.name ?? '');
     } catch (e) {
-        console.error(e);
-        setSchool(null);
+      console.error(e);
+      setSchool(null);
     } finally {
       setLoading(false);
     }
-  },[setSchool])
+  }, [setSchool])
 
   useEffect(() => {
     fetchSchool();
@@ -94,7 +136,7 @@ export default function EditSchoolPage() {
     setError(null);
     try {
       await axiosInstance
-        .patch(`${ENDPOINT.UPDATE_SCHOOL}/${school.id}`, {...school,school_name:school.name})
+        .patch(`${ENDPOINT.UPDATE_SCHOOL}/${school.id}`, { ...school, school_name: school.name })
         .then(() => {
           toaster.toast({
             title: "Berhasil",
@@ -122,7 +164,7 @@ export default function EditSchoolPage() {
         });
       }
     }
-  }, [school,setSaving]);
+  }, [school, setSaving]);
 
   if (loading) {
     return (
@@ -192,13 +234,25 @@ export default function EditSchoolPage() {
             onChange={handleChange}
           />
         </div>
-        <div className="flex items-center gap-4">
-          <Label htmlFor="is_demo">Demo</Label>
-          <Switch
-            id="is_demo"
-            checked={!!school.is_demo}
-            onCheckedChange={(val) => handleSwitchChange("is_demo", val)}
-          />
+        <div>
+          <Label htmlFor="mode_id">School Mode</Label>
+          <div className="mt-1">
+            <Select
+              value={school.mode?.id ? String(school.mode?.id) : ""}
+              onValueChange={handleModeChange}
+            >
+              <SelectTrigger id="mode_id" className="w-full">
+                <SelectValue placeholder="Select School Mode" />
+              </SelectTrigger>
+              <SelectContent>
+                {modes?.map((m) => (
+                  <SelectItem key={m.id} value={String(m.id)}>
+                    {m.name} {m.description ? `- ${m.description}` : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <Label htmlFor="is_active">Active</Label>
@@ -215,8 +269,8 @@ export default function EditSchoolPage() {
             name="students_limit"
             type="text"
             value={school.students_limit ?? ""}
-            onChange={handleChange}
-            min={0}
+            disabled={true}
+            className="cursor-not-allowed"
           />
         </div>
         <div>
@@ -226,8 +280,8 @@ export default function EditSchoolPage() {
             name="violation_type_limit"
             type="text"
             value={school.violation_type_limit ?? ""}
-            onChange={handleChange}
-            min={0}
+            disabled={true}
+            className="cursor-not-allowed"
           />
         </div>
         <div>
@@ -237,8 +291,8 @@ export default function EditSchoolPage() {
             name="violation_limit"
             type="text"
             value={school.violation_limit ?? ""}
-            onChange={handleChange}
-            min={0}
+            disabled={true}
+            className="cursor-not-allowed"
           />
         </div>
         <div>
@@ -248,8 +302,8 @@ export default function EditSchoolPage() {
             name="classes_limit"
             type="text"
             value={school.classes_limit ?? ""}
-            onChange={handleChange}
-            min={0}
+            disabled={true}
+            className="cursor-not-allowed"
           />
         </div>
         <div>
@@ -259,8 +313,8 @@ export default function EditSchoolPage() {
             name="user_limit"
             type="text"
             value={school.user_limit ?? ""}
-            onChange={handleChange}
-            min={0}
+            disabled={true}
+            className="cursor-not-allowed"
           />
         </div>
         <div className="flex justify-end">

@@ -4,8 +4,16 @@ import { LogObject } from "@/objects/logger.object";
 import useInfiniteScroll from "@/user-components/hook/useInfiniteScroll.hook";
 import { formatDateToExactStringAndTime } from "@/util/date.util";
 import { LucideLoaderPinwheel } from "lucide-react";
+import { useEffect, useContext } from "react";
+import { AppContext } from "@/user-components/contexts/app.context";
+import { setDocumentTitle } from "@/util/util";
 
 export default function Page() {
+  const { school } = useContext(AppContext);
+  useEffect(() => {
+    setDocumentTitle('Log Aktivitas', school.name ?? '');
+  }, [school]);
+
   const { data, ref, loading } = useInfiniteScroll<LogObject, HTMLDivElement>({
     filter: {},
     take: 20,

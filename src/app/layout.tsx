@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aplikasi Pelanggarran siswa",
-  description: "Aplikasi pembantu pencatat pelanggaran siswa",
+  title: "APELSI - Aplikasi Pencatatan Pelanggaran Siswa SAAS",
+  description: "APELSI (Aplikasi Pencatatan Pelanggaran Siswa) adalah platform SAAS modern untuk mempermudah sekolah dalam mengelola, mencatat, dan memantau data pelanggaran serta kedisiplinan siswa secara real-time.",
 };
 
 export default function RootLayout({

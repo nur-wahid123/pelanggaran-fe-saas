@@ -4,14 +4,14 @@ import Statistics from "@/user-components/dashboard/statistics";
 import { setDocumentTitle } from "@/util/util";
 import { useContext, useEffect } from "react";
 
-export default function Page(){
+export default function Page() {
   const { school } = useContext(AppContext);
-  useEffect(()=>{
+  useEffect(() => {
     setDocumentTitle('Dashboard', school.name ?? "")
-  },[])
+  }, [])
   return (
     <div>
-      <Statistics/>
+      <Statistics />
     </div>
   )
 }
