@@ -30,8 +30,8 @@ import { axiosInstance } from "@/util/request.util";
 import ENDPOINT from "@/config/url";
 import { ViolationTypeEnum } from "@/enums/violation-type.enum";
 import { Violation } from "@/objects/violation.object";
-import { Student } from "@/objects/student.object";
-import { ViolationType } from "@/objects/violation-type.object";
+import { StudentDto } from "@/objects/student.object";
+import { ViolationTypeDetailDto } from "@/objects/violation-type.object";
 import { Progress } from "@/components/ui/progress";
 import ExcelJS from "exceljs";
 import { useToast } from "@/hooks/use-toast";
@@ -108,7 +108,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
       page: number,
       take: number,
       type: ViolationTypeEnum,
-      data: Violation[] | Student[] | ViolationType[]
+      data: Violation[] | StudentDto[] | ViolationTypeDetailDto[]
     ): Promise<boolean> => {
       let hasNext = true;
       await axiosInstance
@@ -126,7 +126,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
             if (type === ViolationTypeEnum.COLLECTION) {
               data.push(...res.data.data);
             }
-            if (type === ViolationTypeEnum.PER_STUDENT) {
+            if (type === ViolationTypeEnum.PER_STUDENT_EXPORT) {
               data.push(...res.data.data);
             }
             if (type === ViolationTypeEnum.PER_VIOLATION_TYPE) {
@@ -149,8 +149,8 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
     let hasNext = true;
     let page = 1;
     const dataCollection: Violation[] = [];
-    const dataPerStudent: Student[] = [];
-    const dataPerViolationType: ViolationType[] = [];
+    const dataPerStudent: StudentDto[] = [];
+    const dataPerViolationType: ViolationTypeDetailDto[] = [];
     try {
       while (hasNext) {
         await fetchData(
@@ -170,7 +170,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
         await fetchData(
           page,
           100,
-          ViolationTypeEnum.PER_STUDENT,
+          ViolationTypeEnum.PER_STUDENT_EXPORT,
           dataPerStudent
         ).then((res) => {
           hasNext = res;
@@ -206,8 +206,8 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
   const exportData = useCallback(
     async (
       dataCollection: Violation[],
-      dataPerStudent: Student[],
-      dataPerViolationType: ViolationType[]
+      dataPerStudent: StudentDto[],
+      dataPerViolationType: ViolationTypeDetailDto[]
     ) => {
       setProgress(50);
       const workbook = new ExcelJS.Workbook();
@@ -410,7 +410,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
           i + 1,
           `${student.name ? student.name : ""}`,
           `${student.student_class ? student.student_class.name : ""}`,
-          `${student.violations?.reduce((total, violation) => total + violation.violation_types.length, 0)} Poin`,
+          `${student.violations?.reduce((total, violation) => total + violation.violation_types.length, 0)} Pelanggaran`,
           `${totalPoint} Poin`,
         ]);
         exampleRow.eachCell((cell) => {
@@ -421,6 +421,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
           ``,
           `No.`,
           `Pelanggaran`,
+          `Catatan`,
           "Tanggal",
           "Poin",
         ]);
@@ -449,6 +450,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
                 ``,
                 num++,
                 `${violationType ? violationType.name : ""}`,
+                `${violation.note ? violation.note : ""}`,
                 `${violation.date ? formatDateToExactStringAndTime(new Date(violation.date)) : ""}`,
                 `${violationType ? violationType.point : 0} Poin`,
               ]);
@@ -496,25 +498,12 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
       });
 
       dataPerViolationType.map((violationType, i) => {
-        const totalViolations = Array.isArray(violationType.violations)
-          ? violationType.violations.length
-          : 0;
-        const totalStudents = Array.isArray(violationType.violations)
-          ? violationType.violations.reduce(
-              (total, violation) =>
-                total +
-                (Array.isArray(violation.students)
-                  ? violation.students.length
-                  : 0),
-              0
-            )
-          : 0;
-        const totalPoint = violationType.point * totalStudents;
+        const totalPoint = violationType.point * (violationType.total_student ?? 0);
         const exampleRow = worksheet3.addRow([
           i + 1,
           `${violationType.name ? violationType.name : ""}`,
-          `${totalViolations}`,
-          `${violationType.violations?.reduce((total, violation) => total + violation.students?.length, 0)} Siswa`,
+          `${violationType.total_violated}`,
+          `${violationType.total_student} Siswa`,
           `${violationType.point} Poin`,
           `${totalPoint} Poin`,
         ]);
@@ -544,7 +533,7 @@ export default function ExportViolation({ filter }: ExportViolationParam) {
     [setProgress, progress, fetchData]
   );
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
 
   useEffect(() => {
     if (months.length === 0) return;
